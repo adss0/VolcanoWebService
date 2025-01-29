@@ -1,6 +1,5 @@
 # Volcano Web Service
 
-## Overview
 The **Volcano Web Service** is a Java-based RESTful API that provides information about volcanoes and eruptions. It allows users to query data based on country, year range, and geographical location.
 
 ---
