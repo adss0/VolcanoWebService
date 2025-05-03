@@ -192,19 +192,19 @@ The **Eruption** class represents an eruption event. It stores details about the
 - Example: `http://localhost:8088/location?latitude=35&longitude=13&erupted_since=1800`
 - Returns a list of volcanoes **in XML format** located near the specified latitude and longitude, that erupted after the specified year.
 - Example response format:
-    ```xml
-    <Volcano id="809">
-<Name>Etna</Name>
-<Type>Stratovolcano</Type>
-<LastErupted>2018-12-26</LastErupted>
-<Location>
-<Latitude>37.748</Latitude>
-<Longitude>14.999</Longitude>
-<Elevation>3357</Elevation>
-<Country>Italy</Country>
-</Location>
+```xml
+<Volcano id="809">
+    <Name>Etna</Name>
+    <Type>Stratovolcano</Type>
+    <LastErupted>2018-12-26</LastErupted>
+    <Location>
+        <Latitude>37.748</Latitude>
+        <Longitude>14.999</Longitude>
+        <Elevation>3357</Elevation>
+        <Country>Italy</Country>
+    </Location>
 </Volcano>
-    ```
+```
 ---
 
 ## License
