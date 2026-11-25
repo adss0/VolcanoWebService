@@ -1,54 +1,112 @@
-# Volcano Web Service
+# Volcano Web Service 🌋
 
-The **Volcano Web Service** is a Java-based RESTful API that provides information about volcanoes and eruptions. It allows users to query data based on country, year range, and geographical location.
+**A lightweight Java REST API for exploring a database of 1,604 volcanoes and 855 eruptions. Count the volcanoes in any country, list eruptions between two years as JSON, or find volcanoes near a point on the map that have erupted since a given year, returned as XML.**
+
+> ⚡ Built during an Advanced Programming hackathon with Spark Java, SQLite and JDBC. Everything it needs, including the database, is in this repository.
 
 ---
-## Table of Contents
+
+## Table of contents
 
 1. [Features](#features)
-2. [Technologies Used](#technologies-used)
-3. [Installation & Setup](#installation-setup)
-4. [UML](#uml)
-5. [Main Classes](#main-classes)
-6. [API Endpoints](#api-endpoints)
-7. [License](#license)
+2. [How it works](#how-it-works)
+3. [Tech stack](#tech-stack)
+4. [Getting started](#getting-started)
+5. [UML](#uml)
+6. [Main classes](#main-classes)
+7. [API endpoints](#api-endpoints)
+8. [License](#license)
 
 ---
 
 ## Features
-- Get the total number of volcanoes and eruptions.
-- Retrieve the number of volcanoes in a specific country.
-- Get eruption details within a specified year range in JSON format.
-- Search for volcanoes based on latitude, longitude, and last eruption date in XML format.
+
+| | Feature |
+|---|---|
+| 🔢 | Total number of volcanoes and eruptions (`/test`) |
+| 🗺️ | Number of volcanoes in a country (`/country`) |
+| 📅 | Eruptions between two years, with deaths, injuries, missing people and location, as **JSON** (`/year`) |
+| 📍 | Volcanoes near a latitude and longitude that have erupted since a given year, as **XML** (`/location`) |
+| 📦 | Ready to run: the SQLite database and every library are bundled |
 
 ---
 
-## Technologies Used
-- **Java 8+**
-- **Spark Java (Lightweight Web Framework)**
-- **JSON Processing (org.json)**
-- **XML Processing**
-- **JDBC (For database operations)**
+## How it works
+
+```
+ HTTP request              Spark Java routes             JDBC                 SQLite
+┌──────────────┐        ┌─────────────────────┐      ┌──────────┐      ┌─────────────────┐
+│ /year?from=… │ ─────▶ │ VolcanoWebService   │ ───▶ │    DB    │ ───▶ │ data/volcanoes  │
+└──────────────┘        │ (port 8088)         │      └──────────┘      │ .db             │
+        ▲               └──────────┬──────────┘                        └─────────────────┘
+        │                          ▼
+        │               JsonConverter / xmlConverter
+        └────────────── JSON or XML response
+```
+
+1. **Spark Java** listens on port 8088 and sends each request to the matching route.
+2. The **DB** class runs the SQL query against the bundled SQLite database and turns each row into `Eruption` and `Location` objects.
+3. **JsonConverter** (using `org.json`) or **xmlConverter** (using the Java DOM API) formats the results.
 
 ---
 
-## Installation & Setup
+## Tech stack
 
-### Prerequisites
-- Java Development Kit (JDK) 8 or later
-- Eclipse IDE (or any Java IDE of your choice)
-- Apache Maven (for dependency management)
-- Database setup with volcano and eruption data
+| Area | Technology |
+|---|---|
+| Language | Java 17 |
+| Web framework | Spark Java 3 |
+| Database | SQLite (via sqlite-jdbc) |
+| JSON | org.json |
+| XML | Java DOM (`javax.xml`) |
+| IDE project | Eclipse (`.project` / `.classpath` included) |
 
-### Steps to Run
+### Project structure
+
+```
+src/uk/ac/mmu/advprog/hackathon/
+  VolcanoWebService.java   ← Entry point: starts Spark and defines the routes
+  DB.java                  ← Database connection and SQL queries
+  Eruption.java            ← Eruption data class
+  Location.java            ← Location data class
+  JsonConverter.java       ← Eruptions → JSON
+  xmlConverter.java        ← Volcanoes → XML
+lib/                       ← Spark Java, sqlite-jdbc and org.json jars
+data/volcanoes.db          ← The volcano and eruption database
+```
+
+---
+
+## Getting started
+
+**Requirements:** JDK 17 or later. There's nothing else to install: the libraries are in `lib/` and the database is in `data/`.
+
+### Option 1: Eclipse
+
 1. Clone the repository:
-   ```sh
-   git clone <https://github.com/adss0/VolcanoWebService.git>
+
+   ```bash
+   git clone https://github.com/adss0/VolcanoWebService.git
    ```
-2. Open the project in **Eclipse** or any Java IDE.
-3. Ensure dependencies are set up correctly (e.g., Spark Java, JSON, XML handling, JDBC).
-4. Run the `VolcanoWebService.java` file as a **Java Application**.
-5. The service will start on `http://localhost:8088/`.
+
+2. In Eclipse, choose **File → Import → Existing Projects into Workspace** and select the folder.
+3. Run `VolcanoWebService.java` as a **Java Application**.
+
+### Option 2: Terminal
+
+Run these from the project folder (the service looks for the database at `./data/volcanoes.db`):
+
+```bash
+javac -d out -cp "lib/*" src/uk/ac/mmu/advprog/hackathon/*.java
+```
+
+```bash
+java -cp "out:lib/*" uk.ac.mmu.advprog.hackathon.VolcanoWebService
+```
+
+On Windows, use `;` instead of `:` in the second command: `-cp "out;lib/*"`.
+
+The service starts on <http://localhost:8088/>. Try <http://localhost:8088/test> first.
 
 ---
 
@@ -135,6 +193,9 @@ The **Location** class is a helper data class representing the geographical coor
 ### 4. Eruption
 
 The **Eruption** class represents an eruption event. It stores details about the eruption, including the date, the volcano's name, its geographical location, and statistics on casualties (deaths, injuries, and missing persons).
+
+---
+
 ## API Endpoints
 
 ### Test the Service
@@ -183,8 +244,8 @@ The **Eruption** class represents an eruption event. It stores details about the
       "longitude": 138.523
     },
     "deaths": 25
-  },
-    ]
+  }
+]
     ```
 
 ### Get Volcanoes by Location and Last Eruption Date
@@ -208,4 +269,5 @@ The **Eruption** class represents an eruption event. It stores details about the
 ---
 
 ## License
+
 This project is licensed under the **MIT License**.
